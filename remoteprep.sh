@@ -41,11 +41,11 @@ while [[ $n -le $NUMINSTANCES ]]; do
     let n++
 done
 
-    let n--
-
 #Restart from last to firt one
-while [[ $n -ge 1  ]]; do
+while [[ $n -gt 1  ]]; do
 
+    let n--
+    
     if [[ $n == 1 ]];
     then
        #HDF repo
@@ -56,10 +56,8 @@ while [[ $n -ge 1  ]]; do
        echo '=---> Start Ambari Setup'
        sudo ambari-server setup
     fi
-    
-    
+        
     sleep 5
     sudo ssh -t root@$HOSTPREFIX$n "sleep 5; /sbin/reboot"
 
-    let n--
 done
