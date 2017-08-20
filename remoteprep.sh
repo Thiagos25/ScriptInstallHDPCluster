@@ -8,9 +8,13 @@ LOCALPEM='~/.ssh/field.pem'
 #Ambari REPO
 AMBARI_REPO='http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.5.1.0/ambari.repo'
 
+#HDF Management Pack	
+HDF_PACK_URL='http://public-repo-1.hortonworks.com/HDF/centos6/3.x/updates/3.0.0.0/tars/hdf_ambari_mp/'
+HDF_PACK='hdf-ambari-mpack-3.0.0.0-453.tar.gz'
+
 n=1
 while [[ $n -le $NUMINSTANCES ]]; do
-    echo '=---> Start preparation node: '$hostprefix$n
+    echo '=-----------------------------------> Start preparation node: '$hostprefix$n
     sudo ssh -t -i $LOCALPEM $USER@$HOSTPREFIX$n 'sudo -n cp /home/$USER/.ssh/authorized_keys /root/.ssh/'
     sudo scp -i $LOCALPEM $LOCALPEM root@$HOSTPREFIX$n:/root/.ssh/id_rsa
     sudo ssh -t root@$HOSTPREFIX$n "echo never > /sys/kernel/mm/transparent_hugepage/enabled; echo never > /sys/kernel/mm/transparent_hugepage/defrag"
@@ -53,13 +57,17 @@ while [[ $n -gt 1  ]]; do
        #Ambari REPO
        sudo wget -nv $AMBARI_REPO -O /etc/yum.repos.d/ambari.repo
 
-       echo '=---> Start Ambari install'
+       echo '=-----------------------------------> Start Ambari install'
        sudo yum install ambari-server
-       echo '=---> Start Ambari Setup'
+       echo '=-----------------------------------> Start Ambari Setup'
        sudo ambari-server setup
+       
+       echo '=-----------------------------------> Start HDF Management Pack Install'
+       sudo wget -P /tmp/ "$HDF_PACK_URL$HDF_PACK"
+       sudo ambari-server install-mpack --mpack=/tmp/$HDF_PACK --verbose
+       
     fi
         
     sleep 5
     sudo ssh -t root@$HOSTPREFIX$n "sleep 5; /sbin/reboot"
-
 done
