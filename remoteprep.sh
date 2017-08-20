@@ -5,6 +5,9 @@ NUMINSTANCES=8
 HOSTPREFIX='thiago-'
 LOCALPEM='~/.ssh/field.pem'
 
+#Ambari REPO
+AMBARI_REPO='http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.5.1.0/ambari.repo'
+
 n=1
 while [[ $n -le $NUMINSTANCES ]]; do
     echo '=---> Start preparation node: '$hostprefix$n
@@ -45,11 +48,10 @@ done
 while [[ $n -gt 1  ]]; do
 
     let n--
-    
     if [[ $n == 1 ]];
     then
-       #HDF repo
-       sudo wget -nv http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.5.1.0/ambari.repo -O /etc/yum.repos.d/ambari.repo
+       #Ambari REPO
+       sudo wget -nv $AMBARI_REPO -O /etc/yum.repos.d/ambari.repo
 
        echo '=---> Start Ambari install'
        sudo yum install ambari-server
