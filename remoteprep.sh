@@ -1,12 +1,14 @@
+#!/bin/bash -x
+#
 
 #Execute it on node1 = Ambari node
 USER=centos
 NUMINSTANCES=8
-HOSTPREFIX='thiago-'
+HOSTPREFIX='bacen-'
 LOCALPEM='~/.ssh/field.pem'
 
 #Ambari REPO
-AMBARI_REPO='http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.5.1.0/ambari.repo'
+AMBARI_REPO='http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.5.2.0/ambari.repo'
 
 #HDF Management Pack	
 HDF_PACK_URL='http://public-repo-1.hortonworks.com/HDF/centos6/3.x/updates/3.0.0.0/tars/hdf_ambari_mp/'
@@ -25,8 +27,6 @@ while [[ $n -le $NUMINSTANCES ]]; do
     
     #Install pre requirements
     sudo ssh -t -i $LOCALPEM root@$HOSTPREFIX$n "/usr/bin/chmod +x /etc/rc.d/rc.local; yum install -y net-tools vim reposync curl wget unzip zip chkconfig tar openssh-clients ntp; systemctl enable ntpd; systemctl start ntpd; systemctl disable firewalld; service firewalld stop; setenforce 0"
-    sudo ssh -t -i $LOCALPEM root@$HOSTPREFIX$n "wget -P /opt/ --no-cookies --no-check-certificate --header 'Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz'"
-    sudo ssh -t -i $LOCALPEM root@$HOSTPREFIX$n "tar xzf /opt/jdk-8u141-linux-x64.tar.gz"
 
     #Install Java 8
     sudo ssh -t -i $LOCALPEM root@$HOSTPREFIX$n "sudo wget -P /opt/ --no-cookies --no-check-certificate --header 'Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie' 'http://download.oracle.com/otn-pub/java/jdk/8u141-b15/336fa29ff2bb4ef291e347e091f7f4a7/jdk-8u141-linux-x64.tar.gz'"
