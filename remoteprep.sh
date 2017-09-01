@@ -5,6 +5,7 @@
 #Execute it on node1 = Ambari node
 # /home/centos/remoteprep.sh
 
+#HOSTPOSTFIX=.field.hortonworks.com
 USER=centos
 NUMINSTANCES=8
 HOSTPREFIX='bacen-'
