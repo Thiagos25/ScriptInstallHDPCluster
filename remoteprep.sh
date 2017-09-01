@@ -1,11 +1,14 @@
 #!/bin/bash -x
 #
+#scp -i /Users/tsantiago/Desktop/field.pem /Users/tsantiago/Desktop/scriptsFolder/* centos@bacen-1:/home/centos/
 
 #Execute it on node1 = Ambari node
+# /home/centos/remoteprep.sh
+
 USER=centos
 NUMINSTANCES=8
 HOSTPREFIX='bacen-'
-LOCALPEM='~/.ssh/field.pem'
+LOCALPEM=~/.ssh/field.pem
 
 #Ambari REPO
 AMBARI_REPO='http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.5.2.0/ambari.repo'
@@ -17,9 +20,10 @@ HDF_PACK='hdf-ambari-mpack-3.0.0.0-453.tar.gz'
 n=1
 while [[ $n -le $NUMINSTANCES ]]; do
     echo '=-----------------------------------> Start preparation node: '$hostprefix$n
-    sudo ssh -t -i $LOCALPEM $USER@$HOSTPREFIX$n 'sudo -n cp /home/$USER/.ssh/authorized_keys /root/.ssh/'
-    sudo scp -i $LOCALPEM $LOCALPEM root@$HOSTPREFIX$n:/root/.ssh/id_rsa
-    sudo ssh -t root@$HOSTPREFIX$n "echo never > /sys/kernel/mm/transparent_hugepage/enabled; echo never > /sys/kernel/mm/transparent_hugepage/defrag"
+
+    sudo scp -i $LOCALPEM $LOCALPEM $USER@$HOSTPREFIX$n:/home/centos/.ssh/id_rsa
+    sudo ssh -t -i $LOCALPEM $USER@$HOSTPREFIX$n 'sudo -n cp /home/centos/.ssh/authorized_keys /root/.ssh/'
+    sudo ssh -t -i $LOCALPEM root@$HOSTPREFIX$n "echo never > /sys/kernel/mm/transparent_hugepage/enabled; echo never > /sys/kernel/mm/transparent_hugepage/defrag"
 
     sudo scp -i $LOCALPEM /home/$USER/centos_selinux_config root@$HOSTPREFIX$n:/etc/selinux/config
     sudo scp -i $LOCALPEM /home/$USER/centos_etc_profile root@$HOSTPREFIX$n:/etc/profile
