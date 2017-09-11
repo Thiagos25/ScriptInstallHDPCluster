@@ -1,6 +1,7 @@
 #!/bin/bash -x
 #
-#scp -i /Users/tsantiago/Desktop/field.pem /Users/tsantiago/Desktop/scriptsFolder/* centos@bacen-1:/home/centos/
+#scp -i /Users/tsantiago/Documents/ScriptInstallHDPCluster/field.pem /Users/tsantiago/Documents/ScriptInstallHDPCluster/* centos@thiago-1:/home/centos/
+#sudo ssh -t -i /Users/tsantiago/Documents/ScriptInstallHDPCluster/field.pem  centos@thiago-1
 
 #Execute it on node1 = Ambari node
 # /home/centos/remoteprep.sh
@@ -8,8 +9,8 @@
 #HOSTPOSTFIX=.field.hortonworks.com
 USER=centos
 NUMINSTANCES=8
-HOSTPREFIX='bacen-'
-LOCALPEM=~/.ssh/field.pem
+HOSTPREFIX='thiago-'
+LOCALPEM=~/field.pem
 
 #Ambari REPO
 AMBARI_REPO='http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.5.2.0/ambari.repo'
