@@ -1,7 +1,8 @@
 #!/bin/bash -x
-#
-#scp -i /Users/tsantiago/Documents/ScriptInstallHDPCluster/field.pem /Users/tsantiago/Documents/ScriptInstallHDPCluster/* centos@thiago-1:/home/centos/
-#sudo ssh -t -i /Users/tsantiago/Documents/ScriptInstallHDPCluster/field.pem  centos@thiago-1
+
+#ssh-keygen -R thiago-1.field.hortonworks.com
+#scp -i /Users/tsantiago/Documents/ScriptInstallHDPCluster/field.pem /Users/tsantiago/Documents/ScriptInstallHDPCluster/* centos@thiago-1.field.hortonworks.com:/home/centos/
+#ssh -t -i /Users/tsantiago/Documents/ScriptInstallHDPCluster/field.pem  centos@thiago-1.field.hortonworks.com
 
 #Execute it on node1 = Ambari node
 # /home/centos/remoteprep.sh
@@ -14,10 +15,15 @@ LOCALPEM=~/field.pem
 
 #Ambari REPO
 AMBARI_REPO='http://public-repo-1.hortonworks.com/ambari/centos6/2.x/updates/2.5.2.0/ambari.repo'
+#AMBARI_REPO='http://public-repo-1.hortonworks.com/ambari/centos7/2.x/updates/2.6.1.0/ambari.repo'
 
 #HDF Management Pack	
 HDF_PACK_URL='http://public-repo-1.hortonworks.com/HDF/centos6/3.x/updates/3.0.0.0/tars/hdf_ambari_mp/'
 HDF_PACK='hdf-ambari-mpack-3.0.0.0-453.tar.gz'
+
+#HDF_PACK_URL='http://public-repo-1.hortonworks.com/HDF/centos6/3.x/updates/3.1.1.0/tars/hdf_ambari_mp/'
+#HDF_PACK='hdf-ambari-mpack-3.1.1.0-35.tar.gz'
+
 
 n=1
 while [[ $n -le $NUMINSTANCES ]]; do
@@ -51,6 +57,9 @@ while [[ $n -le $NUMINSTANCES ]]; do
     # Setup PATH Variable
     sudo ssh -t root@$HOSTPREFIX$n "export PATH=$PATH:/opt/jdk1.8.0_141/bin:/opt/jdk1.8.0_141/jre/bin"
 
+	# fix MySQL HDF BUG 
+	sudo rpm -Uvh http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
+
     let n++
 done
 
@@ -62,12 +71,17 @@ while [[ $n -gt 1  ]]; do
     then
        #Ambari REPO
        sudo wget -nv $AMBARI_REPO -O /etc/yum.repos.d/ambari.repo
-
+	   
+	   sudo ssh -t root@$HOSTPREFIX$n "sleep 5; /sbin/reboot"
+	   
        echo '=-----------------------------------> Start Ambari install'
        sudo yum install ambari-server
        echo '=-----------------------------------> Start Ambari Setup'
        sudo ambari-server setup
        
+       sudo yum install mysql-connector-java* 
+       sudo ambari-server setup --jdbc-db=mysql --jdbc-driver=/usr/share/java/mysql-connector-java.jar 
+
        echo '=-----------------------------------> Start HDF Management Pack Install'
        sudo wget -P /tmp/ "$HDF_PACK_URL$HDF_PACK"
        sudo ambari-server install-mpack --mpack=/tmp/$HDF_PACK --verbose
